@@ -18,9 +18,13 @@ class CheckoutService(private val cartRepository: CartRepository,
         val cart = cartRepository.get(cartId)
         val itemAlreadyInCart = cart.lineItems.find { it.sku == request.sku } != null
 
-        return when (itemAlreadyInCart) {
+        val updatedCart = when (itemAlreadyInCart) {
             true -> cartModifierService.update(request.sku, cart)
             false -> cartModifierService.add(request.sku, cart)
         }
+
+        cartRepository.update(cartId, updatedCart)
+
+        return updatedCart
     }
 }
